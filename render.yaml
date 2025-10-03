@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: be-room-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        value: globalskill-globalskill.e.aivencloud.com
+      - key: DB_PORT
+        value: "23246"
+      - key: DB_NAME
+        value: room-service
+      - key: DB_USER
+        value: avnadmin
+      - key: DB_PASSWORD
+        sync: false # Set this securely in Render dashboard: AVNS_UQoE8v7UAxMD6Newbta
+      - key: AGORA_APP_ID
+        sync: false # Set this in Render dashboard: fa2c6947f14c43ebaa16ab0fecc756b8
+      - key: AGORA_APP_CERTIFICATE
+        sync: false # Set this in Render dashboard: 5ae251930e5748eda48183f7114c8146
+      - key: CORS_ORIGIN
+        value: "*" # Update with your frontend URL after deployment
+      - key: AUTO_COMPLETION_INTERVAL
+        value: "60000"
+      - key: AUTO_COMPLETION_MARGIN_MINUTES
+        value: "5"
+
+# No need for new database since we're using existing Aiven database
