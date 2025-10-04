@@ -2,8 +2,8 @@ const { RtcTokenBuilder, RtcRole, RtmTokenBuilder } = require('agora-token');
 
 class AgoraConfig {
   constructor() {
-    this.appId = process.env.AGORA_APP_ID || 'fa2c6947f14c43ebaa16ab0fecc756b8';
-    this.appCertificate = process.env.AGORA_APP_CERTIFICATE || '5ae251930e5748eda48183f7114c8146';
+    this.appId = process.env.AGORA_APP_ID || '';
+    this.appCertificate = process.env.AGORA_APP_CERTIFICATE || '';
     this.tokenExpirationInSeconds = 3600; // 1 hour
     this.privilegeExpirationInSeconds = 3600; // 1 hour
     
