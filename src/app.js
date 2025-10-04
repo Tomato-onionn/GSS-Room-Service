@@ -26,9 +26,17 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet());
 
 // CORS configuration
+const corsOrigins = process.env.NODE_ENV === 'production' 
+  ? ['https://gss-room-service.onrender.com', 'http://localhost:5173', 'http://localhost:3000']
+  : ['http://localhost:5173', 'http://localhost:3000', 'https://gss-room-service.onrender.com'];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: process.env.CORS_ORIGIN ? 
+    (process.env.CORS_ORIGIN === '*' ? '*' : process.env.CORS_ORIGIN.split(',')) : 
+    corsOrigins,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
 
 // Logging
@@ -46,7 +54,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Meeting Room Management API Documentation'
+  customSiteTitle: 'Meeting Room Management API Documentation',
+  swaggerOptions: {
+    displayRequestDuration: true,
+    docExpansion: 'none',
+    filter: true,
+    tryItOutEnabled: true,
+  }
 }));
 
 // Health check endpoint

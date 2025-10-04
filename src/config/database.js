@@ -2,12 +2,12 @@ require('dotenv').config();
 const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME, // database name
-  process.env.DB_USER,     // username
-  process.env.DB_PASSWORD, // password
+  'room-service', // database name
+  'avnadmin',     // username
+  'AVNS_UQoE8v7UAxMD6Newbta', // password
   {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    host: 'globalskill-globalskill.e.aivencloud.com',
+    port: 23246,
     dialect: 'mysql',
     dialectOptions: {
       ssl: {
