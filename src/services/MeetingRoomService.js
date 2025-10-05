@@ -50,9 +50,29 @@ class MeetingRoomService {
       // Tạo meeting room
       const newRoom = await this.meetingRoomRepo.create(roomData);
       
-      // TỰ ĐỘNG TẠO MEETING LINK với room ID thực
-      const autoMeetingLink = `http://localhost:5173/meeting/${newRoom.id}`;
-      
+      // TỰ ĐỘNG TẠO MEETING LINK: sử dụng mã ngẫu nhiên giống Google Meet
+      const { generateMeetingCode } = require('../utils/meetingCode');
+      const baseUrl = process.env.MEETING_BASE_URL || 'http://localhost:5173/meeting/';
+
+      // Try to generate a unique code (check DB) to avoid collisions
+      const MAX_ATTEMPTS = 10;
+      let attempts = 0;
+      let code;
+      let exists = null;
+
+      do {
+        if (attempts >= MAX_ATTEMPTS) {
+          throw new Error('Unable to generate unique meeting code, please try again later');
+        }
+
+        code = generateMeetingCode();
+        // Check if any existing meeting_link contains this code
+        exists = await this.meetingRoomDetailRepo.findByMeetingLinkCode(code);
+        attempts++;
+      } while (exists);
+
+      const autoMeetingLink = `${baseUrl}/${code}`;
+
       // Thêm details với meeting_link tự động
       if (details || true) { // Luôn tạo details
         const detailsData = details || {};

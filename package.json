@@ -7,32 +7,40 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo \"No build step required\""
+    "build": "esbuild src/app.js --bundle --platform=node --target=node16 --outfile=dist/app.js",
+    "start:prod": "node dist/app.js"
   },
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=7.0.0"
   },
-  "keywords": ["nodejs", "express", "sequelize", "meeting-room"],
+  "keywords": [
+    "nodejs",
+    "express",
+    "sequelize",
+    "meeting-room"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "agora-token": "^2.0.5",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "mysql2": "^3.15.1",
-    "sequelize": "^6.37.7",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0",
-    "joi": "^17.11.0",
     "helmet": "^7.1.0",
+    "joi": "^17.11.0",
     "morgan": "^1.10.0",
+    "mysql2": "^3.15.1",
     "node-cron": "^3.0.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7",
     "socket.io": "^4.7.5",
-    "agora-token": "^2.0.5"
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
+    "esbuild": "^0.18.17",
     "nodemon": "^3.1.10",
     "sequelize-cli": "^6.6.3"
   }

@@ -1,5 +1,6 @@
 const BaseRepository = require('./BaseRepository');
 const { Meetingroomdetail, Meetingroom } = require('../models');
+const { Op } = require('sequelize');
 
 class MeetingRoomDetailRepository extends BaseRepository {
   constructor() {
@@ -35,6 +36,19 @@ class MeetingRoomDetailRepository extends BaseRepository {
     }));
     
     return await this.bulkCreate(detailsWithRoomId);
+  }
+
+  async findByMeetingLinkCode(code) {
+    // Check meeting_link that ends with '/code' or equals code
+    const likePattern = `%/${code}`;
+    return await this.model.findOne({
+      where: {
+        [Op.or]: [
+          { meeting_link: { [Op.like]: likePattern } },
+          { meeting_link: code }
+        ]
+      }
+    });
   }
 
   async updateByRoomId(roomId, details) {

@@ -107,10 +107,10 @@ router.get('/:id', meetingRoomController.getMeetingRoomById);
  *                   meeting_link:
  *                     type: string
  *                     format: uri
- *                     example: "https://zoom.us/j/123456789"
+ *                     example: ""
  *                   meeting_password:
  *                     type: string
- *                     example: "password123"
+ *                     example: ""
  *                   notes:
  *                     type: string
  *                     example: "Important team meeting"
