@@ -13,8 +13,9 @@ class AutoCompletionService {
       return;
     }
 
-    // Chạy mỗi 5 phút để kiểm tra các meeting cần auto-complete
-    this.cronJob = cron.schedule('*/5 * * * *', async () => {
+      // Schedule: configurable via AUTO_COMPLETE_CRON env var. Default to every minute for accurate end_time handling.
+      const schedule = '*/5 * * * *' ;
+      this.cronJob = cron.schedule(schedule, async () => {
       try {
         console.log('🔄 Checking for meetings to auto-complete...');
         
@@ -35,7 +36,7 @@ class AutoCompletionService {
     });
 
     this.isRunning = true;
-    console.log('🚀 Auto-completion service started (runs every 5 minutes)');
+      console.log(`🚀 Auto-completion service started (schedule: ${schedule})`);
   }
 
   stop() {
@@ -49,7 +50,7 @@ class AutoCompletionService {
   getStatus() {
     return {
       isRunning: this.isRunning,
-      schedule: '*/5 * * * *' // Every 5 minutes
+      schedule: process.env.AUTO_COMPLETE_CRON || (process.env.NODE_ENV === 'development' ? '*/5 * * * *' : '* * * * *')
     };
   }
 

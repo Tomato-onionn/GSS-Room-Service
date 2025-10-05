@@ -92,14 +92,26 @@ class MeetingRoomRepository extends BaseRepository {
   }
 
   async findRoomsReadyToComplete() {
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+    // Find ongoing rooms that should be completed:
+    // - rooms with end_time already passed (precise end)
+    // - rooms that started (actual_start_time) more than 1 hour ago
+    // - rooms without actual_start_time but with start_time more than 1 hour ago
     return await this.model.findAll({
       where: {
         status: 'ongoing',
-        actual_start_time: {
-          [Op.lte]: oneHourAgo
-        }
+        [Op.or]: [
+          { end_time: { [Op.lte]: now } },
+          { actual_start_time: { [Op.lte]: oneHourAgo } },
+          {
+            [Op.and]: [
+              { actual_start_time: null },
+              { start_time: { [Op.lte]: oneHourAgo } }
+            ]
+          }
+        ]
       }
     });
   }

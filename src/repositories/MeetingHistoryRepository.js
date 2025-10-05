@@ -32,7 +32,7 @@ class MeetingHistoryRepository extends BaseRepository {
       ],
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['createdAt', 'DESC']]
+      order: [['completed_at', 'DESC']]
     });
   }
 
@@ -45,7 +45,7 @@ class MeetingHistoryRepository extends BaseRepository {
           as: 'room'
         }
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['completed_at', 'DESC']]
     });
   }
 
