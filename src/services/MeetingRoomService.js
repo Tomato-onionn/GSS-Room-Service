@@ -47,12 +47,40 @@ class MeetingRoomService {
     const transaction = await sequelize.transaction();
     
     try {
+      // Prepare data to create meeting room. Ensure start_time exists to satisfy DB constraints.
+      const createData = { ...roomData };
+      const now = new Date();
+
+      // If user provided start_time, validate it; if missing or invalid, default to now.
+      if (createData.start_time) {
+        const parsed = new Date(createData.start_time);
+        if (isNaN(parsed.getTime())) {
+          console.warn('Invalid start_time provided, falling back to now');
+          createData.start_time = now;
+        } else {
+          createData.start_time = parsed;
+        }
+      } else {
+        createData.start_time = now;
+      }
+
+      // If status is 'ongoing' at creation, also set actual_start_time = start_time
+      if (createData.status === 'ongoing') {
+        createData.actual_start_time = createData.start_time;
+      }
+
+      // Set end_time: if actual_start_time exists use it, otherwise use start_time
+      const baseForEnd = createData.actual_start_time || createData.start_time;
+      if (baseForEnd) {
+        createData.end_time = new Date(new Date(baseForEnd).getTime() + 60 * 60 * 1000);
+      }
+
       // Tạo meeting room
-      const newRoom = await this.meetingRoomRepo.create(roomData);
+      const newRoom = await this.meetingRoomRepo.create(createData);
       
       // TỰ ĐỘNG TẠO MEETING LINK: sử dụng mã ngẫu nhiên giống Google Meet
       const { generateMeetingCode } = require('../utils/meetingCode');
-      const baseUrl = process.env.MEETING_BASE_URL || 'http://localhost:5173/meeting/';
+      const baseUrl = process.env.MEETING_BASE_URL || 'http://localhost:5173/meeting';
 
       // Try to generate a unique code (check DB) to avoid collisions
       const MAX_ATTEMPTS = 10;
@@ -72,6 +100,8 @@ class MeetingRoomService {
       } while (exists);
 
       const autoMeetingLink = `${baseUrl}/${code}`;
+
+      // (start_time and actual_start_time already set on create if needed)
 
       // Thêm details với meeting_link tự động
       if (details || true) { // Luôn tạo details
@@ -110,6 +140,20 @@ class MeetingRoomService {
         throw new Error('Meeting room not found');
       }
       
+      // Nếu client cập nhật start_time mà không kèm end_time, tự động đặt end_time = start_time + 1 giờ
+      if (roomData && roomData.start_time && !roomData.end_time) {
+        const parsed = new Date(roomData.start_time);
+        if (isNaN(parsed.getTime())) {
+          console.warn('Invalid start_time provided in update, falling back to now');
+          const fallback = new Date();
+          roomData.start_time = fallback;
+          roomData.end_time = new Date(fallback.getTime() + 60 * 60 * 1000);
+        } else {
+          roomData.start_time = parsed;
+          roomData.end_time = new Date(parsed.getTime() + 60 * 60 * 1000);
+        }
+      }
+
       // Cập nhật room
       const updatedRoom = await this.meetingRoomRepo.update(id, roomData);
       
@@ -160,6 +204,32 @@ class MeetingRoomService {
     const room = await this.meetingRoomRepo.findById(id);
     if (!room) {
       throw new Error('Meeting room not found');
+    }
+
+    // Nếu chuyển sang 'ongoing', đặt actual_start_time (và start_time nếu còn null)
+    if (status === 'ongoing' && (room.status === 'scheduled' || room.status === null)) {
+      const transaction = await sequelize.transaction();
+      try {
+        const now = new Date();
+        // Nếu start_time chưa set, đặt start_time = now
+        const updateData = { actual_start_time: now };
+        if (!room.start_time) {
+          updateData.start_time = now;
+        }
+
+        // Đặt end_time = base + 1 giờ (nếu actual_start_time tồn tại thì ưu tiên)
+        const baseForEnd = updateData.actual_start_time || updateData.start_time || room.start_time || now;
+        if (baseForEnd) {
+          updateData.end_time = new Date(new Date(baseForEnd).getTime() + 60 * 60 * 1000);
+        }
+
+        const updatedRoom = await this.meetingRoomRepo.updateStatus(id, status, updateData);
+        await transaction.commit();
+        return updatedRoom;
+      } catch (error) {
+        await transaction.rollback();
+        throw error;
+      }
     }
 
     // Nếu chuyển từ ongoing sang completed hoặc canceled, tạo history record
