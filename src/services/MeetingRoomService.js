@@ -100,15 +100,31 @@ class MeetingRoomService {
       } while (exists);
 
       const autoMeetingLink = `${baseUrl}/${code}`;
+      const autoMeetingCode = code; // store only this code in DB
 
       // (start_time and actual_start_time already set on create if needed)
 
-      // Thêm details với meeting_link tự động
+      // Thêm details với meeting_link chỉ lưu mã (không lưu cả URL)
       if (details || true) { // Luôn tạo details
         const detailsData = details || {};
+
+        // Normalize meeting_link: if client provided a full URL, extract last path segment
+        let storedMeetingLink = autoMeetingCode;
+        if (detailsData.meeting_link) {
+          try {
+            const url = new URL(detailsData.meeting_link);
+            const parts = url.pathname.split('/').filter(Boolean);
+            storedMeetingLink = parts.length > 0 ? parts[parts.length - 1] : detailsData.meeting_link;
+          } catch (e) {
+            // Not a URL, store as provided (assume it's the code)
+            storedMeetingLink = detailsData.meeting_link;
+          }
+        }
+
         await this.meetingRoomDetailRepo.create({
           room_id: newRoom.id,
-          meeting_link: detailsData.meeting_link || autoMeetingLink, // Dùng auto link nếu không có
+          // Save only the code segment, not full web link
+          meeting_link: storedMeetingLink,
           meeting_password: detailsData.meeting_password || null,
           notes: detailsData.notes || null,
           recorded_url: detailsData.recorded_url || null
@@ -163,18 +179,42 @@ class MeetingRoomService {
         const existingDetail = await this.meetingRoomDetailRepo.findByRoomId(id);
         
         if (existingDetail.length > 0) {
+          // Normalize meeting_link to store only code
+          let storedMeetingLink = details.meeting_link;
+          if (details.meeting_link) {
+            try {
+              const url = new URL(details.meeting_link);
+              const parts = url.pathname.split('/').filter(Boolean);
+              storedMeetingLink = parts.length > 0 ? parts[parts.length - 1] : details.meeting_link;
+            } catch (e) {
+              // keep as-is
+              storedMeetingLink = details.meeting_link;
+            }
+          }
+
           // Cập nhật detail hiện tại
           await this.meetingRoomDetailRepo.update(existingDetail[0].id, {
-            meeting_link: details.meeting_link,
+            meeting_link: storedMeetingLink,
             meeting_password: details.meeting_password || null,
             notes: details.notes || null,
             recorded_url: details.recorded_url || null
           });
         } else {
-          // Tạo detail mới
+          // Tạo detail mới (normalize meeting_link similarly)
+          let storedMeetingLink = details.meeting_link;
+          if (details.meeting_link) {
+            try {
+              const url = new URL(details.meeting_link);
+              const parts = url.pathname.split('/').filter(Boolean);
+              storedMeetingLink = parts.length > 0 ? parts[parts.length - 1] : details.meeting_link;
+            } catch (e) {
+              storedMeetingLink = details.meeting_link;
+            }
+          }
+
           await this.meetingRoomDetailRepo.create({
             room_id: id,
-            meeting_link: details.meeting_link,
+            meeting_link: storedMeetingLink,
             meeting_password: details.meeting_password || null,
             notes: details.notes || null,
             recorded_url: details.recorded_url || null
