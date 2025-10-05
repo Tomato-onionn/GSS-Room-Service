@@ -124,6 +124,28 @@ class MeetingRoomController {
       next(error);
     }
   };
+
+  // @desc    Get meeting id by meeting_link
+  // @route   GET /api/meeting-rooms/by-link?meeting_link=...
+  // @access  Public
+  getMeetingIdByLink = async (req, res, next) => {
+    try {
+      const { meeting_link } = req.query;
+      if (!meeting_link) {
+        return res.status(400).json({ success: false, message: 'meeting_link query param is required' });
+      }
+
+      const result = await this.meetingRoomService.findMeetingIdByLink(meeting_link);
+
+      if (!result) {
+        return res.status(404).json({ success: false, message: 'Meeting not found' });
+      }
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = MeetingRoomController;

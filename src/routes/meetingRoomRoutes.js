@@ -47,6 +47,29 @@ router.get('/', meetingRoomController.getAllMeetingRooms);
 
 /**
  * @swagger
+ * /api/meeting-rooms/by-link:
+ *   get:
+ *     summary: Find meeting_id by meeting_link
+ *     tags: [Meeting Rooms]
+ *     parameters:
+ *       - in: query
+ *         name: meeting_link
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Full meeting link or last code segment
+ *     responses:
+ *       200:
+ *         description: Meeting id found
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: Not found
+ */
+router.get('/by-link', meetingRoomController.getMeetingIdByLink);
+
+/**
+ * @swagger
  * /api/meeting-rooms/{id}:
  *   get:
  *     summary: Get meeting room by ID

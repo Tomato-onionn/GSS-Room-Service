@@ -310,6 +310,26 @@ class MeetingRoomService {
     
     return completedRooms;
   }
+
+  // Find meeting id by meeting_link (full link or code segment)
+  async findMeetingIdByLink(meetingLink) {
+    // If the client passed a full URL, try to extract the last path segment as code
+    let code = meetingLink;
+    try {
+      const url = new URL(meetingLink);
+      const parts = url.pathname.split('/').filter(Boolean);
+      if (parts.length > 0) code = parts[parts.length - 1];
+    } catch (e) {
+      // Not a full URL, keep meetingLink as-is
+      code = meetingLink;
+    }
+
+    // First try exact match on meeting_link, then try code suffix
+    const detail = await this.meetingRoomDetailRepo.findByMeetingLinkCode(code);
+    if (!detail) return null;
+
+    return { meeting_id: detail.room_id };
+  }
 }
 
 module.exports = MeetingRoomService;
