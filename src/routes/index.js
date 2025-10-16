@@ -4,6 +4,7 @@ const meetingHistoryRoutes = require('./meetingHistoryRoutes');
 const roomParticipantsRoutes = require('./roomParticipantsRoutes');
 const adminRoutes = require('./adminRoutes');
 const agoraRoutes = require('./agoraRoutes');
+const chatRoutes = require('./chatRoutes');
 const SocketService = require('../services/SocketService');
 
 const router = express.Router();
@@ -91,6 +92,7 @@ router.use('/meeting-history', meetingHistoryRoutes);
 router.use('/room-participants', roomParticipantsRoutes);
 router.use('/admin', adminRoutes);
 router.use('/agora', agoraRoutes);
+router.use('/chat', chatRoutes);
 
 // Debug route for socket rooms
 router.get('/debug/rooms', (req, res) => {
