@@ -5,6 +5,7 @@ const roomParticipantsRoutes = require('./roomParticipantsRoutes');
 const adminRoutes = require('./adminRoutes');
 const agoraRoutes = require('./agoraRoutes');
 const chatRoutes = require('./chatRoutes');
+const feedbackRoutes = require('./feedbackRoutes');
 const SocketService = require('../services/SocketService');
 
 const router = express.Router();
@@ -93,6 +94,7 @@ router.use('/room-participants', roomParticipantsRoutes);
 router.use('/admin', adminRoutes);
 router.use('/agora', agoraRoutes);
 router.use('/chat', chatRoutes);
+router.use('/feedbacks', feedbackRoutes);
 
 // Debug route for socket rooms
 router.get('/debug/rooms', (req, res) => {

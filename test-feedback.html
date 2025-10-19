@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Feedback API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .test-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .response.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .response.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Feedback API Testing</h1>
+
+        <!-- Create Feedback -->
+        <div class="test-section">
+            <h2>1. Tạo Feedback Mới</h2>
+            <div class="form-group">
+                <label>Module Type:</label>
+                <select id="moduleType">
+                    <option value="meeting_room">Meeting Room</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="user">User</option>
+                    <option value="course">Course</option>
+                    <option value="system">System</option>
+                    <option value="chatbot">Chatbot</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Module ID:</label>
+                <input type="text" id="moduleId" placeholder="e.g., 123" value="1">
+            </div>
+            <div class="form-group">
+                <label>User ID:</label>
+                <input type="text" id="userId" placeholder="e.g., user123" value="user001">
+            </div>
+            <div class="form-group">
+                <label>Rating (1-5):</label>
+                <input type="number" id="rating" min="1" max="5" value="5">
+            </div>
+            <div class="form-group">
+                <label>Comment:</label>
+                <textarea id="comment" placeholder="Nhập nhận xét của bạn...">Dịch vụ rất tuyệt vời! Phòng họp sạch sẽ và tiện nghi.</textarea>
+            </div>
+            <button onclick="createFeedback()">Tạo Feedback</button>
+            <div id="createResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- Get All Feedbacks -->
+        <div class="test-section">
+            <h2>2. Lấy Tất Cả Feedbacks</h2>
+            <div class="form-group">
+                <label>Page:</label>
+                <input type="number" id="page" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>Limit:</label>
+                <input type="number" id="limit" value="10" min="1" max="100">
+            </div>
+            <button onclick="getAllFeedbacks()">Lấy Feedbacks</button>
+            <div id="allResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- Get Feedbacks by Module -->
+        <div class="test-section">
+            <h2>3. Lấy Feedbacks Theo Module</h2>
+            <div class="form-group">
+                <label>Module Type:</label>
+                <select id="filterModuleType">
+                    <option value="meeting_room">Meeting Room</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="chatbot">Chatbot</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Module ID (Optional):</label>
+                <input type="text" id="filterModuleId" placeholder="Leave empty for all">
+            </div>
+            <button onclick="getFeedbacksByModule()">Lấy Feedbacks</button>
+            <div id="moduleResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- Get Statistics -->
+        <div class="test-section">
+            <h2>4. Thống Kê Feedback</h2>
+            <div class="form-group">
+                <label>Module Type:</label>
+                <select id="statsModuleType">
+                    <option value="">All Modules</option>
+                    <option value="meeting_room">Meeting Room</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="chatbot">Chatbot</option>
+                </select>
+            </div>
+            <button onclick="getStatistics()">Xem Thống Kê</button>
+            <div id="statsResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/feedbacks';
+
+        async function createFeedback() {
+            const data = {
+                module_type: document.getElementById('moduleType').value,
+                module_id: document.getElementById('moduleId').value,
+                user_id: document.getElementById('userId').value,
+                rating: parseInt(document.getElementById('rating').value),
+                comment: document.getElementById('comment').value
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                const responseDiv = document.getElementById('createResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = response.ok ? 'response success' : 'response error';
+                responseDiv.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                const responseDiv = document.getElementById('createResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function getAllFeedbacks() {
+            const page = document.getElementById('page').value;
+            const limit = document.getElementById('limit').value;
+
+            try {
+                const response = await fetch(`${API_URL}?page=${page}&limit=${limit}`);
+                const result = await response.json();
+                const responseDiv = document.getElementById('allResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = response.ok ? 'response success' : 'response error';
+                responseDiv.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                const responseDiv = document.getElementById('allResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function getFeedbacksByModule() {
+            const moduleType = document.getElementById('filterModuleType').value;
+            const moduleId = document.getElementById('filterModuleId').value;
+            
+            let url = `${API_URL}/module/${moduleType}`;
+            if (moduleId) {
+                url += `?module_id=${moduleId}`;
+            }
+
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                const responseDiv = document.getElementById('moduleResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = response.ok ? 'response success' : 'response error';
+                responseDiv.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                const responseDiv = document.getElementById('moduleResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function getStatistics() {
+            const moduleType = document.getElementById('statsModuleType').value;
+            let url = `${API_URL}/statistics`;
+            if (moduleType) {
+                url += `?module_type=${moduleType}`;
+            }
+
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                const responseDiv = document.getElementById('statsResponse');
+                responseDiv.style.display = 'block';
+                
+                if (response.ok && result.success) {
+                    responseDiv.className = 'response success';
+                    
+                    // Display statistics in a nice format
+                    const stats = result.data;
+                    let html = '<div class="stats-grid">';
+                    html += `<div class="stat-card"><h3>${stats.total}</h3><p>Tổng Feedbacks</p></div>`;
+                    html += `<div class="stat-card"><h3>${stats.averageRating}</h3><p>Điểm Trung Bình</p></div>`;
+                    html += `<div class="stat-card"><h3>${stats.pending}</h3><p>Chờ Xử Lý</p></div>`;
+                    html += `<div class="stat-card"><h3>${stats.responded}</h3><p>Đã Phản Hồi</p></div>`;
+                    html += '</div>';
+                    html += '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                    responseDiv.innerHTML = html;
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.textContent = JSON.stringify(result, null, 2);
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById('statsResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

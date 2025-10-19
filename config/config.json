@@ -1,11 +1,18 @@
 {
   "development": {
-    "username": "root",
-    "password": "",
-    "database": "room_management",
-    "host": "127.0.0.1",
-    "port": 3306,
-    "dialect": "mysql"
+    "use_env_variable": "DATABASE_URL",
+    "username": null,
+    "password": null,
+    "database": null,
+    "host": null,
+    "port": null,
+    "dialect": "mysql",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   },
   "test": {
     "username": "root",
