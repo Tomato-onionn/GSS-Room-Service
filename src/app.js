@@ -27,8 +27,8 @@ app.use(helmet());
 
 // CORS configuration
 const corsOrigins = process.env.NODE_ENV === 'production' 
-  ? ['https://gss-room-service.onrender.com', 'http://localhost:5173', 'http://localhost:3000',"https://globalskill.vercel.app"]
-  : ['http://localhost:5173', 'http://localhost:3000', 'https://gss-room-service.onrender.com',"https://globalskill.vercel.app"];
+  ? ['https://gss-room-service.onrender.com', 'http://localhost:5173', 'http://localhost:3000', 'https://globalskill.vercel.app', 'https://global-skill-swap.vercel.app']
+  : ['http://localhost:5173', 'http://localhost:3000', 'https://gss-room-service.onrender.com', 'https://globalskill.vercel.app', 'https://global-skill-swap.vercel.app'];
 
 app.use(cors({
   origin: process.env.CORS_ORIGIN ? 
