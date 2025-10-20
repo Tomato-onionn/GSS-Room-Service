@@ -545,7 +545,7 @@ class FeedbackController {
       const statusCounts = statusDistribution.reduce((acc, item) => {
         acc[item.status] = parseInt(item.dataValues.count);
         return acc;
-      }, { pending: 0, responded: 0, archived: 0 });
+      }, { pending: 0, reviewed: 0, resolved: 0, archived: 0 });
 
       return res.status(200).json({
         success: true,
@@ -554,7 +554,8 @@ class FeedbackController {
           total,
           averageRating: parseFloat(avgRating.toFixed(2)),
           pending: statusCounts.pending,
-          responded: statusCounts.responded,
+          reviewed: statusCounts.reviewed,
+          resolved: statusCounts.resolved,
           archived: statusCounts.archived,
           ratingCounts: ratingDistribution
         }
