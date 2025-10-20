@@ -31,9 +31,24 @@ const corsOrigins = process.env.NODE_ENV === 'production'
   : ['http://localhost:5173', 'http://localhost:3000', 'https://gss-room-service.onrender.com', 'https://globalskill.vercel.app', 'https://global-skill-swap.vercel.app'];
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN ? 
-    (process.env.CORS_ORIGIN === '*' ? '*' : process.env.CORS_ORIGIN.split(',')) : 
-    corsOrigins,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Remove trailing slash for comparison
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    
+    const allowedOrigins = process.env.CORS_ORIGIN 
+      ? (process.env.CORS_ORIGIN === '*' ? '*' : process.env.CORS_ORIGIN.split(',').map(o => o.trim().replace(/\/$/, '')))
+      : corsOrigins.map(o => o.replace(/\/$/, ''));
+    
+    if (allowedOrigins === '*' || allowedOrigins.includes(normalizedOrigin)) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
