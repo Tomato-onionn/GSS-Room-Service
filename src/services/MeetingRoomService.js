@@ -80,7 +80,7 @@ class MeetingRoomService {
       
       // TỰ ĐỘNG TẠO MEETING LINK: sử dụng mã ngẫu nhiên giống Google Meet
       const { generateMeetingCode } = require('../utils/meetingCode');
-      const baseUrl = process.env.MEETING_BASE_URL || 'http://localhost:5173/meeting'||'https://globalskill.vercel.app';
+      const baseUrl = process.env.MEETING_BASE_URL || 'http://localhost:5173/meeting'||'https://globalskill.vercel.app'||"https://global-skill-swap.vercel.app";
 
       // Try to generate a unique code (check DB) to avoid collisions
       const MAX_ATTEMPTS = 10;

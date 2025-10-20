@@ -26,7 +26,7 @@ services:
       - key: AGORA_APP_CERTIFICATE
         sync: false # Set this in Render dashboard: 5ae251930e5748eda48183f7114c8146
       - key: CORS_ORIGIN
-        value: "https://gss-room-service.onrender.com,http://localhost:5173,http://localhost:3000,https://globalskill.vercel.app"
+        value: "https://gss-room-service.onrender.com,http://localhost:5173,http://localhost:3000,https://globalskill.vercel.app,https://global-skill-swap.vercel.app"
       - key: AUTO_COMPLETION_INTERVAL
         value: "60000"
       - key: AUTO_COMPLETION_MARGIN_MINUTES

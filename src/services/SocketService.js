@@ -8,9 +8,18 @@ class SocketService {
   }
 
   initialize(server) {
+    // Parse CORS origins - same as app.js
+    const corsOrigins = process.env.NODE_ENV === 'production' 
+      ? ['https://gss-room-service.onrender.com', 'http://localhost:5173', 'http://localhost:3000', 'https://globalskill.vercel.app', 'https://global-skill-swap.vercel.app']
+      : ['http://localhost:5173', 'http://localhost:3000', 'https://gss-room-service.onrender.com', 'https://globalskill.vercel.app', 'https://global-skill-swap.vercel.app'];
+
+    const allowedOrigins = process.env.CORS_ORIGIN ? 
+      (process.env.CORS_ORIGIN === '*' ? '*' : process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())) : 
+      corsOrigins;
+
     this.io = new Server(server, {
       cors: {
-        origin: process.env.CORS_ORIGIN || '*',
+        origin: allowedOrigins,
         methods: ['GET', 'POST'],
         credentials: true
       },
@@ -18,7 +27,7 @@ class SocketService {
     });
 
     this.setupEventHandlers();
-    console.log('🔌 Socket.IO initialized');
+    console.log('🔌 Socket.IO initialized with origins:', allowedOrigins);
   }
 
   setupEventHandlers() {
